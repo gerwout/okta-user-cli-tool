@@ -71,7 +71,7 @@ parser.add_argument('--domain', required=True, help='Okta domain, e.g. mycompany
 parser.add_argument('--userids', metavar='<user id>', nargs='*', help='1 or more okta user ids that should be deactivated', required=True)
 parser.add_argument('--api-token', required=True, help='Okta API key')
 parser.add_argument('--action', required=True, type=str, choices=['activate', 'deactivate', 'delete'], help='Set the action: activate, deactivate or delete')
-parser.add_argument('--remove-group-membership', required=False, action='store_true', default=False, help='When deleting a user, remove them from all groups first')
+parser.add_argument('--remove-group-membership', required=False, action='store_true', default=False, help='When deactivating a user, remove them from all groups first')
 args = parser.parse_args()
 
 OKTA_KEY = args.api_token
@@ -87,13 +87,13 @@ if remove_group_membership:
 
 for idx, user_id in enumerate(user_ids):
     if action == "deactivate":
-        deactivate_user(user_id)
-    elif action == "activate":
-        activate_user(user_id)
-    elif action == "delete":
         if remove_group_membership:
             groups = fetch_groups(user_id)
             if groups is not None:
                 for group in groups:
                     remove_user_from_group(user_id, group)
+        deactivate_user(user_id)
+    elif action == "activate":
+        activate_user(user_id)
+    elif action == "delete":
         delete_user(user_id)
